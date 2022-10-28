@@ -1,0 +1,69 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+:root{
+  --main-color:#0095F0;
+  --second-color:#3fb3fc1d;
+  --text-color:#99999B;
+}
+body{
+  width:70vw;
+  margin: 0 auto;
+}
+.top-container{
+  width: inherit;
+  display: flex;
+  justify-content: flex-start;
+}
+.left-handle{
+  width: 40%;
+  flex-shrink: 0;
+}
+.upload-broke{
+  width: 60%;
+  height: 150px;
+  background: var(--second-color);
+  flex-shrink: 0;
+  border-radius: 20px;
+  border: 10px dashed var(--main-color);
+  position: relative;
+}
+.upload-broke::before{
+  content: "";
+  width: 10px;
+  height: 30px;
+  background-color: var(--main-color);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+.upload-broke::after{
+  content: "";
+  width: 30px;
+  height: 10px;
+  background-color: var(--main-color);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+}
+.upload-broke input{
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.progress-box{
+  width: 100%;
+  height: 5px;
+  border-radius: 2.5px;
+  border: 0.5px solid var(--text-color);
+}
+.progress{
+  width: 100%;
+  height: 100%;
+  background-color: var(--main-color);
+}
