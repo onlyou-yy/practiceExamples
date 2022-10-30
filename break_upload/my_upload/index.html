@@ -16,30 +16,38 @@
       </div>
       <div> 
         <input type="checkbox" id="DBSelected">
-        <label for="DBSelected">启用IndexDB缓存</label>
+        <label for="DBSelected">IndexDB缓存</label>
+      </div>
+      <div> 
+        <input type="checkbox" id="multiSelected">
+        <label for="multiSelected">单文件上传</label>
       </div>
       <div> 
         <input type="checkbox" id="multiSelected">
         <label for="multiSelected">多文件上传</label>
+      </div>
+      <div> 
+        <input type="checkbox" id="multiSelected">
+        <label for="multiSelected">断点续传</label>
       </div>
     </div>
     <div class="upload-broke">
       <input type="file">
     </div>
   </div>
-  <div class="list-handle">
-    <div class="item-handle">
-      <button class="download btn">全部下载</button>
-      <button class="delete btn">全部删除</button>
-      <button class="pause btn">全部暂停</button>
-    </div>
-  </div>
-  <div class="upload-progress all">
+  <div class="upload-item all">
     <span>全部进度</span>
-    <div class="progress-box">
-      <div class="progress"></div>
+    <div class="upload-progress">
+      <div class="progress-box">
+        <div class="progress"></div>
+      </div>
+      <span>100%</span>
     </div>
-    <span>100%</span>
+    <div class="item-handle">
+      <button class="download btn">下载</button>
+      <button class="delete btn">删除</button>
+      <button class="pause btn">暂停</button>
+    </div>
   </div>
   <div class="upload-list">
     <div class="upload-item">
@@ -48,6 +56,7 @@
         <div class="progress-box">
           <div class="progress"></div>
         </div>
+        <span>100%</span>
       </div>
       <div class="item-handle">
         <button class="download btn">下载</button>
@@ -56,5 +65,8 @@
       </div>
     </div>
   </div>
+  <script src="https://cdn.bootcdn.net/ajax/libs/spark-md5/3.0.2/spark-md5.js"></script>
+  <script src="./js/request.js"></script>
+  <script src="./js/upload.js"></script>
 </body>
 </html>
