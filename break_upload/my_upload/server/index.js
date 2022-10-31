@@ -42,13 +42,13 @@ app.post("/upload_sigle_file",(req,res)=>{
     uploadDir
   }).parse(req,(err,fields,files)=>{
     if(err){
-      res.end({
+      res.json({
         code:400,
         codeText:"upload error",
       })
       return
     }
-    res.send({
+    res.json({
       code:200,
       codeText:"upload success",
       originalFilename:files.file[0].originalFilename,
@@ -67,7 +67,7 @@ app.post("/has_upload",async (req,res)=>{
       return indexReg.exec(a)[1] - indexReg.exec(b)[1]
     })
   }
-  res.send({
+  res.json({
     code:200,
     codeText:"",
     fileList
@@ -88,14 +88,14 @@ app.post("/upload_chunk",async (req,res)=>{
     if(!await sourceIsExists(filePath)){
       await saveFileTo(file,filePath)
     }
-    res.send({
+    res.json({
       code:200,
       codeText:"upload success",
       originalFilename:filename,
       servicePath:filePath.replace(__dirname,HOSTNAME)
     })
   } catch (error) {
-    res.send({
+    res.json({
       code:500,
       codeText:"upload error",
       originalFilename:filename,
@@ -107,9 +107,9 @@ app.post("/merge_file",async (req,res)=>{
   let {hash,count} = req.body
   try {
     let msg = await mergeFile(hash,count);
-    res.send(msg);
+    res.json(msg);
   } catch (error) {
-    res.send({
+    res.json({
       code:500,
       codeText:"server error"
     })

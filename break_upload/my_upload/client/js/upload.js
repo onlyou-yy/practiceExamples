@@ -19,10 +19,6 @@ async function getFileHash(file){
   return sparkMD5.end();
 } 
 
-function createFormData(){
-  
-}
-
 uploadInputEl.addEventListener("change",async (event)=>{
   let file = uploadInputEl.files[0]
   let suffix = /\.([0-9a-zA-Z]+)$/.exec(file.name)[1]
