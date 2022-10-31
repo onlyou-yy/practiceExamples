@@ -48,20 +48,20 @@ exports.parseFormData = function(req){
         reject(err);
         return
       }
-      resolve(
+      resolve({
         fields,
         files
-      )
+      })
     })
   })
 }
 
 exports.getSuffix = function(str){
-  let [_,suffix] = /^\.([0-9A-Za-z]+)&/.exec(str);
+  let [_,suffix] = /\.([0-9A-Za-z]+)$/.exec(str);
   return suffix;
 }
 
-exports.file2Buffer = function file2Buffer(file){
+function file2Buffer(file){
   return new Promise((resolve,reject)=>{
     let fileReader = new FileReader()
     fileReader.onload = function(res){
@@ -70,6 +70,7 @@ exports.file2Buffer = function file2Buffer(file){
     fileReader.readAsArrayBuffer(file)
   })
 }
+exports.file2Buffer = file2Buffer
 
 exports.getFileHASH = async function(file){
   let sparkMD5 = new SparkMD5.ArrayBuffer();
@@ -78,7 +79,7 @@ exports.getFileHASH = async function(file){
   return sparkMD5.end();
 }
 
-exports.sourceIsExists = function sourceIsExists(name){
+function sourceIsExists(name){
   return new Promise((resolve=>{
     fs.access(name,fs.constants.F_OK,err => {
       if(err){
@@ -89,6 +90,7 @@ exports.sourceIsExists = function sourceIsExists(name){
     })
   }))
 }
+exports.sourceIsExists = sourceIsExists
 
 exports.saveFileTo = function(file,path){
   return new Promise((resolve,reject)=>{
@@ -121,14 +123,14 @@ exports.mergeFile = function(HASH,count){
       })
       return;
     }
+    let suffix = /\.([0-9A-Za-z])/.exec(fileList[0])[1]
     let filePath = `${uploadDir}/${HASH}.${suffix}`
-    if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
+    // if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
     fileList.sort((a,b)=>{
       let reg = /_(\d+)/
       return reg.exec(a)[1] - reg.exec(b)[1]
     }).forEach(item => {
-      let suffix = /^\.([0-9A-Za-z])/.exec(item)[1]
-      fs.appendFileSync(filePath,fs.readFileSync(`${uploadDir}/${item}`))
+      fs.appendFileSync(filePath,fs.readFileSync(`${uploadDir}/${HASH}/${item}`))
     })
     fs.rmdirSync(sliceDir)
     resolve({

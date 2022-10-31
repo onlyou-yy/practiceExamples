@@ -30,18 +30,19 @@ app.use((req,res,next)=>{
   res.header("Access-Control-Allow-Origin","*");
   res.append('Access-Control-Allow-Methods', 'OPTIONS, GET, PUT, POST, DELETE')
   res.append('Access-Control-Allow-Headers', '*')
-  req.method === "OPTIONS" ? res.send("all method"):next();
+  req.method === "OPTIONS" ? res.json("all method"):next();
 })
 
 app.use(bodyParser.urlencoded({extended:false,limit:"1024mb"}))
 app.use(bodyParser.json({extended:false,limit:"1024mb"}))
 app.use(bodyParser.raw({extended:false,limit:"1024mb"}))
 
-app.post("/upload_sigle_file",(req,res)=>{
+app.post("/upload_single_file",(req,res)=>{
   new multiparty.Form({
     uploadDir
   }).parse(req,(err,fields,files)=>{
     if(err){
+      console.log(err)
       res.json({
         code:400,
         codeText:"upload error",
@@ -57,7 +58,7 @@ app.post("/upload_sigle_file",(req,res)=>{
   });
 })
 
-app.post("/has_upload",async (req,res)=>{
+app.get("/has_upload",async (req,res)=>{
   let HASH = req.query.fileHash
   let fileList = []
   let hasFile = await sourceIsExists(`${uploadDir}/${HASH}`)
@@ -95,6 +96,7 @@ app.post("/upload_chunk",async (req,res)=>{
       servicePath:filePath.replace(__dirname,HOSTNAME)
     })
   } catch (error) {
+    console.log(error);
     res.json({
       code:500,
       codeText:"upload error",
