@@ -1,4 +1,5 @@
-const baseURL = "http://172.16.16.29:3000"
+// const baseURL = "http://172.16.16.29:3000"
+const baseURL = "http://192.168.1.8:3000"
 const defaultDataType = {
   "Content-Type":"application/x-www-form-urlencoded"
 }

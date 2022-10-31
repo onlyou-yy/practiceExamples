@@ -123,7 +123,7 @@ exports.mergeFile = function(HASH,count){
       })
       return;
     }
-    let suffix = /\.([0-9A-Za-z])/.exec(fileList[0])[1]
+    let suffix = /\.([0-9A-Za-z]+)/.exec(fileList[0])[1]
     let filePath = `${uploadDir}/${HASH}.${suffix}`
     // if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
     fileList.sort((a,b)=>{
@@ -132,7 +132,7 @@ exports.mergeFile = function(HASH,count){
     }).forEach(item => {
       fs.appendFileSync(filePath,fs.readFileSync(`${uploadDir}/${HASH}/${item}`))
     })
-    fs.rmdirSync(sliceDir)
+    fs.rmSync(sliceDir,{recursive:true,force:true})
     resolve({
       code: 501,
       codeText: "merge success",
