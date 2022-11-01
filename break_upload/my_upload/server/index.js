@@ -20,6 +20,9 @@ const express = require("express"),
 
 const app = express();
 
+// https://blog.csdn.net/github_38589282/article/details/79270654
+process.on('unhandledRejection', rej => console.warn('全局捕获Rejection', rej));
+
 app.listen(PORT,()=>{
   console.log('服务器开启成功：' + HOSTNAME);
 })
@@ -93,7 +96,6 @@ app.post("/upload_chunk",async (req,res)=>{
       code:200,
       codeText:"upload success",
       originalFilename:filename,
-      servicePath:filePath.replace(__dirname,HOSTNAME)
     })
   } catch (error) {
     console.log(error);

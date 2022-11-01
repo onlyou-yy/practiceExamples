@@ -1,5 +1,5 @@
-// const baseURL = "http://172.16.16.29:3000"
-const baseURL = "http://192.168.1.8:3000"
+const baseURL = "http://172.16.16.29:3000"
+// const baseURL = "http://192.168.1.8:3000"
 const defaultDataType = {
   "Content-Type":"application/x-www-form-urlencoded"
 }
@@ -12,7 +12,8 @@ const FormDataType = {
 }
 
 function request(options = {
-  onprogress:()=>{}
+  onprogress:()=>{},
+  index:0,
 }){
   let xhr = new XMLHttpRequest();
   let headers = {}
@@ -46,7 +47,7 @@ function request(options = {
       }
       xhr.upload.onprogress = function(e){
         if(options.onprogress){
-          options.onprogress(+(e.loaded / e.total).toFixed(3),e.loaded,e.total);
+          options.onprogress(options.index,e.loaded,e.total,+(e.loaded / e.total).toFixed(4));
         }
       }
       xhr.send(data);

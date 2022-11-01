@@ -12,23 +12,21 @@
     <div class="left-handle">
       <div>
         <span>最大文件限制(M)</span>
-        <input type="text" name="" id="">
+        <input type="text" name="limit" id="sizeLimit" value="200M">
       </div>
       <div> 
         <input type="checkbox" id="DBSelected">
         <label for="DBSelected">IndexDB缓存</label>
       </div>
       <div> 
-        <input type="checkbox" id="multiSelected">
-        <label for="multiSelected">单文件上传</label>
+        <input type="radio" id="singleSel" name="isMulti" checked>
+        <label for="singleSel">单文件上传</label>
+        <input type="radio" id="multiSel" name="isMulti">
+        <label for="multiSel">多文件上传</label>
       </div>
       <div> 
-        <input type="checkbox" id="multiSelected">
-        <label for="multiSelected">多文件上传</label>
-      </div>
-      <div> 
-        <input type="checkbox" id="multiSelected">
-        <label for="multiSelected">断点续传</label>
+        <input type="checkbox" id="isSlice" checked>
+        <label for="isSlice">切片上传</label>
       </div>
     </div>
     <div class="upload-broke">
@@ -41,7 +39,7 @@
       <div class="progress-box">
         <div class="progress"></div>
       </div>
-      <span>100%</span>
+      <span>0%</span>
     </div>
     <div class="item-handle">
       <button id="download" class="download btn">下载</button>
@@ -50,6 +48,9 @@
     </div>
   </div>
   <div class="upload-list">
+  </div>
+
+  <template id="upload-item-template">
     <div class="upload-item">
       <span>name</span>
       <div class="upload-progress">
@@ -64,7 +65,8 @@
         <button id="pause" class="pause btn">暂停</button>
       </div>
     </div>
-  </div>
+  </template>
+
   <script src="https://cdn.bootcdn.net/ajax/libs/spark-md5/3.0.2/spark-md5.js"></script>
   <script src="./js/request.js"></script>
   <script src="./js/upload.js"></script>

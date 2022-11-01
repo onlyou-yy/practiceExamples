@@ -43,14 +43,15 @@ exports.parseFormData = function(req){
   return new Promise((resolve,reject)=>{
     new multiparty.Form({
       maxFilesSize: 200 * 1024 * 1024
-    }).parse(req,(err,fields,{file:files})=>{
+    }).parse(req,(err,fields,files)=>{
       if(err){
         reject(err);
         return
       }
+      if(!files) throw new Error("error")
       resolve({
         fields,
-        files
+        files:files.file
       })
     })
   })
@@ -125,7 +126,7 @@ exports.mergeFile = function(HASH,count){
     }
     let suffix = /\.([0-9A-Za-z]+)/.exec(fileList[0])[1]
     let filePath = `${uploadDir}/${HASH}.${suffix}`
-    // if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
+    if(fs.existsSync(filePath)) fs.unlinkSync(filePath)
     fileList.sort((a,b)=>{
       let reg = /_(\d+)/
       return reg.exec(a)[1] - reg.exec(b)[1]
@@ -134,10 +135,10 @@ exports.mergeFile = function(HASH,count){
     })
     fs.rmSync(sliceDir,{recursive:true,force:true})
     resolve({
-      code: 501,
+      code: 200,
       codeText: "merge success",
       filename:`${HASH}.${suffix}`,
-      servicePath:`${uploadDir}/${HASH}.${suffix}`.replace(uploadDir,HOSTNAME)
+      servicePath:`${uploadDir}/${HASH}.${suffix}`.replace(__dirname,HOSTNAME)
     })
   })
 }
