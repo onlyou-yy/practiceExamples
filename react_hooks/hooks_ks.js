@@ -1,3 +1,5 @@
+//https://www.bilibili.com/video/BV1iV411b7L1/?spm_id_from=333.337.search-card.all.click&vd_source=41ed998ac767425fb616fd9071ce9682
+
 let isMount = true;//是否是挂载阶段，一开始的时候一定是挂载的
 let workInProgressHook = null //hook链表指针
 
