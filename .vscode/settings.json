@@ -10,5 +10,6 @@
     "<C-f>": false
   },
   "explorer.fileNesting.enabled": false,
-  "explorer.compactFolders": false
+  "explorer.compactFolders": false,
+  "hediet.vscode-drawio.theme": "min"
 }
