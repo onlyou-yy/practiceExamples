@@ -54,7 +54,7 @@ class Compiler{
   }
 }
 
-
+//Compilation 主要负责编译转化的工作
 class Compilation{
   constructor(webpackOptions){
     this.options = webpackOptions;
