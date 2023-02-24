@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{
+      box-sizing: border-box;
+    }
+    .qrcode,.img-box{
+      position: absolute;
+      width: 430px;
+      height: 430px; 
+    }
+    .qrcode{
+      height: 530px;
+      left: 0;
+    }
+    .img-bg{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .center{
+      width: 45.5%;
+      height: 45.5%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+    .img-icon{
+      border-radius: 100%;
+      background-image: url(./img/icon13.jpg);
+      background-size: 548px 182px;
+      background-position: center;
+    }
+    .bg-white{
+      border-radius: 100%;
+      background-color: white;
+    }
+    .qrcode-name{
+      text-align: center;
+      font-size: 30px;
+      font-weight: bold;
+      padding: 10px;
+      color: black;
+      position: absolute;
+      width: 100%;
+      bottom: -100px;
+      left: 0%;
+    }
+    .qrcode-des{
+      text-align: center;
+      font-size: 20px;
+      font-weight: 500;
+      padding: 10px;
+      color: black;
+      position: absolute;
+      width: 100%;
+      bottom: -50px;
+      left: 0%;
+    }
+    .img-list{
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .img-list img{
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="img-list"></div>
+  <div>
+    <input id="selFile" type="file" onchange="selectFile()">
+  </div>
+  <svg viewBox="0 0 430 530" xmlns="http://www.w3.org/2000/svg">
+    <style>
+      *{
+        box-sizing: border-box;
+      }
+      .qrcode,.img-box{
+        position: absolute;
+        width: 430px;
+        height: 430px; 
+      }
+      .qrcode{
+        height: 530px;
+        left: 0;
+      }
+      .img-bg{
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .center{
+        width: 45.5%;
+        height: 45.5%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+      }
+      .img-icon{
+        border-radius: 100%;
+        background-image: url(./img/icon13.jpg);
+        background-size: 548px 182px;
+        background-position: center;
+      }
+      .bg-white{
+        border-radius: 100%;
+        background-color: white;
+      }
+      .qrcode-name{
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        padding: 10px;
+        color: black;
+        position: absolute;
+        width: 100%;
+        bottom: -100px;
+        left: 0%;
+      }
+      .qrcode-des{
+        text-align: center;
+        font-size: 20px;
+        font-weight: 500;
+        padding: 10px;
+        color: black;
+        position: absolute;
+        width: 100%;
+        bottom: -50px;
+        left: 0%;
+      }
+      .img-list{
+        display: flex;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .img-list img{
+        width: 100px;
+        height: 100px;
+        margin-right: 10px;
+      }
+    </style>
+    <foreignObject x="0" y="0" width="430" height="530">
+      <div class="qrcode" id="qrcode">
+        <div class="img-box">
+          <img src="./img/bg.jpg" class="img-bg" alt="">
+          <div class="center bg-white"></div> 
+          <div class="center img-icon"></div> 
+          <div class="qrcode-des">编号00-2</div>
+          <div class="qrcode-name">中山温泉</div>
+        </div>
+      </div>
+    </foreignObject>
+  </svg>
+  
+  <button onclick="download()">html2canvas-download</button>
+  <button onclick="download2()">svg-download</button>
+  <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="./js/utils.js"></script>
+  <script>
+    let qrcodeEl = document.querySelector("#qrcode");
+    let imgList = document.querySelector(".img-list");
+    let iconEl = document.querySelector(".img-icon");
+    let nameEl = document.querySelector(".qrcode-name");
+    let fileEl = document.querySelector("#selFile")
+
+    let urls = [
+      {name:"中山温泉",url:"./img/icon1.jpg"},
+      {name:"中山温泉",url:"./img/icon2.png"},
+      {name:"中山温泉",url:"./img/icon3.jpg"},
+      {name:"中山温泉",url:"./img/icon4.jpg"},
+      {name:"中山温泉",url:"./img/icon5.jpg"},
+      {name:"中山温泉",url:"./img/icon7.jpg"},
+      {name:"中山温泉",url:"./img/icon8.jpg"},
+      {name:"中山温泉",url:"./img/icon9.jpg"},
+      {name:"中山温泉",url:"./img/icon10.jpg"},
+      {name:"中山温泉",url:"./img/icon11.jpg"},
+      {name:"中山温泉",url:"./img/icon12.jpg"},
+      {name:"中山温泉",url:"./img/icon13.jpg"},
+    ]
+    for(let item of urls){
+      let img = document.createElement("img");
+      img.src = item.url;
+      img.onclick = function(){
+        nameEl.innerHTML = item.name;
+        iconEl.style.backgroundImage = `url(${item.url})`;
+        iconEl.style.backgroundSize = `${img.naturalWidth * (430 * 0.455) / img.naturalHeight}px ${430 * 0.455}px`;
+      }
+      imgList.appendChild(img)
+    }
+
+    iconEl.src = urls[0].url;
+    nameEl.innerHTML = urls[0].name;
+
+    fetch('./img/bg.jpg?'+ Date.now())
+    .then(response => response.blob())
+    .then(data => {
+      let fileReader = new FileReader();
+      fileReader.onloadend = function(){
+        let image = document.querySelector(".img-bg")
+        image.src = fileReader.result;
+        console.log("bg img loaded");
+      }
+      fileReader.readAsDataURL(data)
+    });
+
+
+    function download(){
+      html2canvas(qrcodeEl,opts = {
+        dpi: window.devicePixelRatio * 4,
+        scale:0.5,
+        // useCORS: true // 【重要】开启跨域配置
+      }).then(canvas => {
+          let oImg = new Image();
+          let url = canvas.toDataURL() 
+          oImg.src = url;  // 导出图片
+          // document.body.appendChild(oImg);  // 将生成的图片添加到body
+          let a = document.createElement("a");
+          a.download="sfas"
+          a.href = url;
+          a.click();
+      });
+    }
+
+    function download2(){
+      let node = document.querySelector("svg")
+      // let node = document.body;
+      covertSVG2Image(node,"fff",430,530,"png")
+    }  
+
+    function selectFile(){
+      let fileReader = new FileReader();
+      fileReader.onloadend = function(e){
+        let dataUrl = e.currentTarget.result;
+        let img = new Image();
+        img.onload = function(){
+          iconEl.style.backgroundImage = `url(${dataUrl})`;
+          iconEl.style.backgroundSize = `${img.naturalWidth * (430 * 0.455) / img.naturalHeight}px ${430 * 0.455}px`;
+        }
+        img.src = dataUrl;
+      }
+      fileReader.readAsDataURL(fileEl.files[0]);
+    }
+  </script>
+</body>
+</html>

@@ -1,9 +1,15 @@
 const sparkMD5 = new SparkMD5.ArrayBuffer();
+const chunkSize = 100 * 1024 // 100kb
+const maxChunkCount = 50
+
 let listHandle = document.querySelector(".upload-item.all .item-handle")
 let itemHandle = document.querySelector(".upload-item .item-handle")
+let sizeLimit = document.querySelector("#sizeLimit")
+let [isSingle,isMulti] = document.querySelectorAll("input[name=isMulti]")
+let isSlice = document.querySelector("#isSlice")
 let uploadInputEl = document.querySelector(".upload-broke input");
-const chunkSize = 100 * 1024 // 100kb
-const maxChunkCount = 100
+let allProgressBar = document.querySelector(".upload-item.all .progress")
+let allProgressLab = document.querySelector(".upload-item.all .upload-progress span")
 
 function file2Buffer(file){
   return new Promise((resolve,reject)=>{
@@ -28,6 +34,47 @@ function getSuffix(name){
   return reg.exec(name)[1];
 }
 
+function throttle(fn,wait){
+  let timer = null
+  return function(){
+    let context = this;
+    let args = arguments;
+    if(!timer){
+      timer = setTimeout(()=>{
+        fn.apply(context,args);
+        timer = null;
+      },wait)
+    }
+  }
+}
+
+function complate(info = {}){
+  let index = 0
+  info = Object.assign({},info)
+  return function(){
+    index++
+    if(index == info.totalCount){
+      console.timeEnd("useTime")
+      mergeFile(info.HASH,info.totalCount);
+    }
+  }
+}
+
+function setProgressBar(proArr,total){
+  let curTotal = proArr.reduce((pre,next)=>pre + next,0);
+  let persent = Math.min(1,+(curTotal / total).toFixed(4));
+  allProgressBar.style.width = `${(persent * 100).toFixed(2)}%`;
+  allProgressLab.innerHTML = `${(persent * 100).toFixed(2)}%`;
+}
+const thro_setProgressBar = throttle(setProgressBar,600);
+function progress(totalSize){
+  let chunkProArr = [];
+  return function(index,loaded,total,persent){
+    chunkProArr[index] = loaded;
+    thro_setProgressBar(chunkProArr,totalSize)
+  }
+}
+
 async function createFormData(file,filename){
   let formData = new FormData()
   let HASH = filename ? "" : await getFileHash(file);
@@ -36,37 +83,31 @@ async function createFormData(file,filename){
   formData.append("filename",filename)
   return formData
 }
-function complate(info = {}){
-  let index = 0
-  info = Object.assign({},info)
-  return function complateHandle(){
-    index++
-    if(index == info.totalCount){
-      console.log("upload success")
-      mergeFile(info.HASH,info.totalCount);
-    }
-  }
-}
+
 async function uploadSingleFile(file){
-  let {abort,uploadFile} = request();
+  let progressHandle = progress(file.size)
+  let {abort,uploadFile} = request({onprogress:progressHandle,index:0});
+  allAbort.push(abort);
   let formData = await createFormData(file)
+  console.time("useTime")
   uploadFile('/upload_single_file',formData).then(res=>{
-    console.log(res)
+    console.timeEnd("useTime")
   })
 }
 async function checkFileReady(hashName,suffix){
   let {get} = request();
   return await get("/has_upload",{fileHash:hashName,suffix})   
 }
-async function uploadFileChunk(chunk,info,complateHandle){
-  let {abort,uploadFile} = request() 
+async function uploadFileChunk(chunk,index,info){
+  let {abort,uploadFile} = request({onprogress:info.progressHandle,index});
+  allAbort.push(abort);
   if(info.readyChunks.includes(chunk.filename)){
-    complateHandle()
+    info.complateHandle()
     return
   }
   let formData = await createFormData(chunk.file,chunk.filename)
   uploadFile("/upload_chunk",formData).then(res=>{
-    complateHandle();
+    info.complateHandle();
   })
 }
 async function mergeFile(hash,count){
@@ -80,32 +121,59 @@ async function uploadBigFile(file){
   let chunkList = [];
   let count = Math.min(maxChunkCount,Math.ceil(file.size / chunkSize));
   let index = 0
+  let size = Math.ceil(file.size / count);
   while(index < count){
     chunkList.push({
-      file:file.slice(index*chunkSize,(index + 1) * chunkSize),
+      file:file.slice(index*size,(index + 1) * size),
       filename:`${HASH}_${index}.${suffix}`
     })
     index++;
   }
-  let info = {HASH,readyChunks,totalCount:count}
-  let complateHandle = complate(info)
-  chunkList.forEach(chunk => {
-    uploadFileChunk(chunk,info,complateHandle);
+  let complateHandle = complate({HASH,totalCount:count})
+  let progressHandle = progress(file.size)
+  let info = {
+    readyChunks,
+    complateHandle,
+    progressHandle
+  }
+  console.time("useTime")
+  chunkList.forEach((chunk,index) => {
+    uploadFileChunk(chunk,index,info);
   })
 }
 
+isMulti.addEventListener("change",function(){
+  uploadInputEl.multiple = true;
+})
+isSingle.addEventListener("change",function(){
+  uploadInputEl.multiple = false;
+})
 uploadInputEl.addEventListener("change",async (event)=>{
-  let file = uploadInputEl.files[0]
-  // uploadSingleFile(file)
-  uploadBigFile(file)
+  let files = uploadInputEl.files
+  for(let file of files){
+    if(isSlice.checked){
+      uploadBigFile(file)
+    }else{
+      uploadSingleFile(file)
+    }
+  }
   event.target.value = "";
 })
 
 function downloadFile(){}
 function deleteFile(){}
-function pauseFile(){}
+
+let allAbort = [];
+function pauseFile(){
+  console.log(allAbort)
+  let temp = allAbort.slice();
+  for(let abort of temp){
+    abort();
+  }
+  allAbort = [];
+}
 function handleClick(e,isAll){
-  let target = e.currentTarget;
+  let target = e.target;
   switch(target.id){
     case "download":
       downloadFile()
