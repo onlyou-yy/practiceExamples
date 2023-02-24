@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>gcb3.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>armv7</string>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>180</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>5088CD644DBE13676B687701834DECB531231A75</string>
+				<key>dateExpires</key>
+				<string>2022/12/18</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>armv7</string>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>5088CD644DBE13676B687701834DECB531231A75</string>
+						<key>dateExpires</key>
+						<string>2022/12/18</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>QBImagePicker.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>96RC9N8KCR</string>
+						<key>name</key>
+						<string>Guangdong Engineering Bao Technology Co., Ltd.</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>3.4.0</string>
+				</dict>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>armv7</string>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>1.5.1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>5088CD644DBE13676B687701834DECB531231A75</string>
+						<key>dateExpires</key>
+						<string>2022/12/18</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>RSKImageCropper.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>96RC9N8KCR</string>
+						<key>name</key>
+						<string>Guangdong Engineering Bao Technology Co., Ltd.</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>1.5.1</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>96RC9N8KCR.com.gcb.platform.ios</string>
+				<key>aps-environment</key>
+				<string>production</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>96RC9N8KCR</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>gcb3.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>4525594e-cc78-49e5-82c3-695861130638</string>
+				<key>dateExpires</key>
+				<string>2023/7/19</string>
+				<key>name</key>
+				<string>iOS Team Ad Hoc Provisioning Profile: com.gcb.platform.ios</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>96RC9N8KCR</string>
+				<key>name</key>
+				<string>Guangdong Engineering Bao Technology Co., Ltd.</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>4.5.6</string>
+		</dict>
+	</array>
+</dict>
+</plist>
