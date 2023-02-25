@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{
+      box-sizing: border-box;
+    }
+    .qrcode,.img-box{
+      position:relative;
+      width: 430px;
+      height: 430px;
+      font-size: 16px;
+    }
+    .qrcode{
+      height: 530px;
+      left: 0;
+    }
+    .img-bg{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .center{
+      width: 45.5%;
+      height: 45.5%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+    .img-icon{
+      border-radius: 100%;
+      background-image: url(./img/icon13.jpg);
+      background-size: 548px 182px;
+      background-position: center;
+    }
+    .bg-white{
+      border-radius: 100%;
+      background-color: white;
+    }
+    .qrcode-name{
+      text-align: center;
+      font-size: 2em;
+      font-weight: bold;
+      padding: 10px;
+      color: black;
+      position: absolute;
+      width: 100%;
+      bottom: -24%;
+      left: 0%;
+    }
+    .qrcode-des{
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: 500;
+      padding: 10px;
+      color: black;
+      position: absolute;
+      width: 100%;
+      bottom: -12%;
+      left: 0%;
+    }
+    .img-list{
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .img-list img{
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="qrcode" id="qrcode">
+    <div class="img-box">
+      <img src="./img/bg.jpg" class="img-bg" alt="">
+      <div class="center bg-white"></div> 
+      <div class="center img-icon"></div> 
+      <div class="qrcode-des">编号00-2</div>
+      <div class="qrcode-name">中山温泉</div>
+    </div>
+  </div>
+
+  <button onclick="loadZip()">loadZip</button>
+  <input type="file" id="zipFile">
+  <script src="https://cdn.bootcdn.net/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    const SIZE = 430 * 3;
+    let qrcodeEl = document.querySelector("#qrcode");
+    let imgBox = document.querySelector(".img-box");
+    let iconEl = document.querySelector(".img-icon");
+    let nameEl = document.querySelector(".qrcode-name");
+    let desEl = document.querySelector(".qrcode-des");
+    let bgEl = document.querySelector(".img-bg");
+
+    qrcodeEl.style.width = `${SIZE}px`;
+    qrcodeEl.style.height = `${~~(SIZE * 1.233)}px`;
+    imgBox.style.fontSize = `${~~(0.0372 * SIZE)}px`;
+    imgBox.style.width = `${SIZE}px`;
+    imgBox.style.height = `${SIZE}px`;
+
+    iconEl.style.backgroundSize = `${1552 * (SIZE * 0.455) / 1539}px ${SIZE * 0.455}px`;
+
+  </script>
+  <script>
+    let zipFileEl = document.querySelector("#zipFile");
+    let zip = new JSZip();
+    function loadZip(){
+      console.time("genZip");
+      let zips = zipFileEl.files[0];
+      zip.loadAsync(zips)
+        .then(function({files}) {
+          let promiseArr = [];
+          for(let path in files){
+            let fileInfo = path.split(".");
+            let [fileName = "",eqName = ""] = fileInfo[0].split("_");
+            promiseArr.push(zip.file(path).async("base64").then(res=>{
+              return Promise.resolve({
+                originName:path,
+                fileName,
+                eqName,
+                filetype:fileInfo[1],
+                source:"data:image/png;base64," + res,
+              })
+            }));
+          }
+          Promise.all(promiseArr).then(async allFiles =>{
+            console.log(allFiles);
+            let genZip = new JSZip();
+            for(let fileObj of allFiles){
+              let {fileName,eqName,originName,source} = fileObj 
+              setInfo(fileName,eqName);
+              await loadBg(source);
+              let dataURl = await genImg();
+              let base64Data = dataURl.split(",")[1];
+              genZip.file(originName,base64Data,{base64:true});
+            }
+            console.log(genZip);
+            genZip.generateAsync({type:"blob"}).then(function(content) {
+              saveAs(content, "example.zip");
+              console.timeEnd("genZip");
+            });
+          })
+        });
+    }
+
+    function loadBg(url){
+      new Promise(resolve=>{
+        bgEl.onload = function(){
+          resolve();
+        }
+        bgEl.src = url
+      })
+    }
+    function genImg(){
+      return new Promise((resolve,reject)=>{
+        html2canvas(qrcodeEl,opts = {
+          dpi: window.devicePixelRatio * 4,
+        }).then(canvas => {
+          let url = canvas.toDataURL("image/png")
+          resolve(url);
+        });
+      })
+    }
+    function setInfo(name,eqName){
+      nameEl.innerHTML = name;
+      desEl.innerHTML = eqName;
+    }
+  </script>
+  
+</body>
+</html>
