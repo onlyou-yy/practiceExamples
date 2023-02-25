@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{
+      box-sizing: border-box;
+    }
+    .qrcode,.img-box{
+      position:relative;
+      width: 430px;
+      height: 430px;
+      font-size: 16px;
+    }
+    .qrcode{
+      height: 530px;
+      left: 0;
+    }
+    .img-bg{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .center{
+      width: 45.5%;
+      height: 45.5%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+    }
+    .img-icon{
+      border-radius: 100%;
+      background-image: url(./img/icon13.jpg);
+      background-size: 548px 182px;
+      background-position: center;
+    }
+    .bg-white{
+      border-radius: 100%;
+      background-color: white;
+    }
+    .qrcode-name{
+      text-align: center;
+      font-size: 2em;
+      font-weight: bold;
+      padding: 10px;
+      color: black;
+      position: absolute;
+      width: 100%;
+      bottom: -24%;
+      left: 0%;
+    }
+    .qrcode-des{
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: 500;
+      padding: 10px;
+      color: black;
+      position: absolute;
+      width: 100%;
+      bottom: -12%;
+      left: 0%;
+    }
+    .img-list{
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+    }
+    .img-list img{
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="img-list"></div>
+  <div>
+    <input id="selFile" type="file" onchange="selectFile()">
+  </div>
+
+  <div class="qrcode" id="qrcode">
+    <div class="img-box">
+      <img src="./img/bg.jpg" class="img-bg" alt="">
+      <div class="center bg-white"></div> 
+      <div class="center img-icon"></div> 
+      <div class="qrcode-des">编号00-2</div>
+      <div class="qrcode-name">中山温泉</div>
+    </div>
+  </div>
+  
+  
+  <button onclick="download()">html2canvas-download</button>
+  <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    const SIZE = 430 * 2;
+    let qrcodeEl = document.querySelector("#qrcode");
+    let imgBox = document.querySelector(".img-box");
+    let imgList = document.querySelector(".img-list");
+    let iconEl = document.querySelector(".img-icon");
+    let nameEl = document.querySelector(".qrcode-name");
+    let fileEl = document.querySelector("#selFile")
+
+    qrcodeEl.style.width = `${SIZE}px`;
+    qrcodeEl.style.height = `${~~(SIZE * 1.233)}px`;
+    imgBox.style.fontSize = `${~~(0.0372 * SIZE)}px`;
+    imgBox.style.width = `${SIZE}px`;
+    imgBox.style.height = `${SIZE}px`; 
+
+    let urls = [
+      {name:"中山温泉",url:"./img/icon1.jpg"},
+      {name:"中山温泉",url:"./img/icon2.png"},
+      {name:"中山温泉",url:"./img/icon3.jpg"},
+      {name:"中山温泉",url:"./img/icon4.jpg"},
+      {name:"中山温泉",url:"./img/icon5.jpg"},
+      {name:"中山温泉",url:"./img/icon7.jpg"},
+      {name:"中山温泉",url:"./img/icon8.jpg"},
+      {name:"中山温泉",url:"./img/icon9.jpg"},
+      {name:"中山温泉",url:"./img/icon10.jpg"},
+      {name:"中山温泉",url:"./img/icon11.jpg"},
+      {name:"中山温泉",url:"./img/icon12.jpg"},
+      {name:"中山温泉",url:"./img/icon13.jpg"},
+    ]
+    for(let item of urls){
+      let img = document.createElement("img");
+      img.src = item.url;
+      img.onclick = function(){
+        nameEl.innerHTML = item.name;
+        iconEl.style.backgroundImage = `url(${item.url})`;
+        iconEl.style.backgroundSize = `${img.naturalWidth * (SIZE * 0.455) / img.naturalHeight}px ${SIZE * 0.455}px`;
+      }
+      imgList.appendChild(img)
+    }
+
+    iconEl.src = urls[0].url;
+    nameEl.innerHTML = urls[0].name;
+
+
+    function download(){
+      html2canvas(qrcodeEl,opts = {
+        dpi: window.devicePixelRatio * 4,
+        // scale:0.5,
+        // useCORS: true // 【重要】开启跨域配置
+      }).then(canvas => {
+          let oImg = new Image();
+          let url = canvas.toDataURL("image/png") 
+          oImg.src = url;  // 导出图片
+          // document.body.appendChild(oImg);  // 将生成的图片添加到body
+          let a = document.createElement("a");
+          a.download="sfas.png"
+          a.href = url;
+          a.click();
+      });
+    }
+
+    function selectFile(){
+      let fileReader = new FileReader();
+      fileReader.onloadend = function(e){
+        let dataUrl = e.currentTarget.result;
+        let img = new Image();
+        img.onload = function(){
+          iconEl.style.backgroundImage = `url(${dataUrl})`;
+          iconEl.style.backgroundSize = `${img.naturalWidth * (SIZE * 0.455) / img.naturalHeight}px ${SIZE * 0.455}px`;
+        }
+        img.src = dataUrl;
+      }
+      fileReader.readAsDataURL(fileEl.files[0]);
+    }
+  </script>
+</body>
+</html>
