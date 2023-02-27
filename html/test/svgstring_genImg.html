@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button onclick="download()">download</button>
+  <button onclick="dataURLtoFile()">dataURLtoFile</button>
+  <script>
+    let svgText = "";
+
+    fetch('https://picsum.photos/seed/picsum/200/300?'+ Date.now())
+    .then(response => response.blob())
+    .then(data => {
+      let fileReader = new FileReader();
+      fileReader.onloadend = function(){
+        svgText = `
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <style>
+            polygon {
+              fill: black
+            }
+
+            div {
+              color: white;
+              font: 18px serif;
+              height: 100%;
+              overflow: auto;
+            }
+            .showImg{
+              border-radius: 50%;
+            }
+          </style>
+
+          <polygon points="5,5 195,10 185,185 10,195" />
+
+          <foreignObject x="20" y="20" width="160" height="160">
+            <div xmlns="http://www.w3.org/1999/xhtml">
+              <img class="showImg" src="${fileReader.result}" width="100" height="100"></img>
+              四大佛教苏丹诺夫
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque cum exercitationem quia provident molestias, omnis perspiciatis rerum ducimus. Sint ab ullam cupiditate molestias? Consequatur itaque soluta perferendis sapiente aspernatur ad.
+            </div>
+          </foreignObject>
+        </svg>
+          `;
+        console.log("img",fileReader.result);
+      }
+      fileReader.readAsDataURL(data)
+    });
+
+    function download(){
+      let image = new Image()
+      image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgText)
+      // image.src = 'data:image/svg+xml;base64,' + btoa(svgText)
+      let canvas = document.createElement('canvas')
+      canvas.width = 200
+      canvas.height = 200
+      let context = canvas.getContext('2d')
+      context.fillStyle = '#fff'
+      context.fillRect(0, 0, 10000, 10000)
+      image.onload = function () {
+        context.drawImage(image, 0, 0)
+        let a = document.createElement('a')
+        a.download = `${'test'}.${'png'}`
+        a.href = canvas.toDataURL(`image/${'png'}`)
+        a.click()
+      }
+      image.onerror = function(e){
+        console.log("error",e);
+      }
+      document.body.appendChild(canvas)
+    }
+  </script>
+</body>
+</html>
