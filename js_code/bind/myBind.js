@@ -1,6 +1,5 @@
 Function.prototype.myBind = function(ctx,...bindArgs){
   let that = this
-  function temp(){}
   function fBind(...args){
     ctx = this instanceof fBind ? this : ctx;
     let context = ctx ? Object(ctx) : window
@@ -10,7 +9,17 @@ Function.prototype.myBind = function(ctx,...bindArgs){
     delete context.fn
     return result;
   }
-  temp.prototype = this.prototype;
-  fBind.prototype = new temp()
+  // function temp(){}
+  // temp.prototype = this.prototype;
+  // fBind.prototype = new temp()
+  fBind.prototype = ObjectCreate(this.prototype);
+
   return fBind
+}
+
+// Object.create 原理
+function ObjectCreate(obj){
+  function F(){};
+  F.prototype = obj;
+  return new F();
 }

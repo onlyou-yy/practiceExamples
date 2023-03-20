@@ -90,7 +90,7 @@ export class MyPromise {
     let count = 0;
     return new MyPromise((resolve,reject) => {
       const addResult = (value,i) => {
-        result[i](value);
+        result[i] = value;
         count++;
         if(result.length === count){
           resolve(result)
