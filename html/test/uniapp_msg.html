@@ -1,33 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="./js/uni.webview.1.5.4.js"></script>
 </head>
+
 <body>
   <h2>this is uniapp test page</h2>
+  <h3 id="readyState"></h3>
   <button onclick="sendInfoToUni()">sendInfoToUni</button>
+  <button onclick="windowSendInfoToUni()">windowSendInfoToUni</button>
+  <script src="./js/uni.webview.1.5.4.js"></script>
   <script>
-    document.addEventListener('UniAppJSBridgeReady', function() {
+    let stateEl = document.querySelector("#readyState");
+    stateEl.innerText = "sdk is not ready";
+    document.addEventListener('UniAppJSBridgeReady', function () {
+      stateEl.innerText = "sdk is ready";
       uni.postMessage({
-          data: {
-              action: 'message'
-          }
+        data: {
+          action: 'postMessage'
+        }
       });
-      uni.getEnv(function(res) {
-          console.log('当前环境：' + JSON.stringify(res));
-      });
+      
     });
-    function sendInfoToUni(){
+    function sendInfoToUni() {
+      stateEl.innerText = "sendInfoToUni is run";
       uni.postMessage({
-          data: {
-              action: 'hello'
-          }
+        data: {
+          action: 'hello'
+        }
       });
+    }
+    function windowSendInfoToUni() {
+      stateEl.innerText = "windowSendInfoToUni is run";
+      window.top.postMessage({
+        data: {
+          action: 'postMessage'
+        }
+      },"*")
     }
   </script>
 </body>
+
 </html>
