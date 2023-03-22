@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <form id="pForm">
+    <div>
+      <span style="display:inline-block;width:80px;">userid</span>
+      <input type="text" id="userid" placeholder="430281200303313916">
+    </div>
+    <div>
+      <span style="display:inline-block;width:80px;">用户名</span>
+      <input type="text" id="username" placeholder="金阳">
+    </div>
+    <div>
+      <span style="display:inline-block;width:80px;">头像url</span>
+      <input type="url" id="avatar" placeholder="https://picsum.photos/50/50">
+    </div>
+  </form>
+  <button onclick="genUrl()">生成url</button>
+  <div id="container"></div>
+
+  <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.min.js"></script>
+  <script src="./js/index.js"></script>
+</body>
+
+</html>
