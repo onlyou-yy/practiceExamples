@@ -32,8 +32,7 @@ async function createTemplate(data){
   const {size,width,height,fontSize,iconUrl,bgUrl,name,code} = data;
   const bgDataUrl = await genImgDataUrlByImgUrl(bgUrl);
   const iconDataUrl = await genImgDataUrlByImgUrl(iconUrl);
-  const htmlString = `
-  <svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+  const htmlString = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
     <style>
       *{
         box-sizing: border-box;
@@ -97,7 +96,7 @@ async function createTemplate(data){
       }
     </style>
     <foreignObject x="0" y="0" width="${width}" height="${height}">
-      <div class="qrcode" id="qrcode">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="qrcode" id="qrcode">
         <div class="img-box">
           <img src="${bgDataUrl}" class="img-bg" alt=""></img>
           <div class="center bg-white"></div> 
@@ -126,6 +125,8 @@ function genImgDataUrlByImgUrl(url,width,height){
     img.onload = () => {
       canvas.width = width || img.naturalWidth
       canvas.height = height || img.naturalHeight
+      context.fillStyle = '#fff'
+      context.fillRect(0, 0, 10000, 10000)
       context.drawImage(img, 0, 0)
       const imgDataUrl = canvas.toDataURL("image/jpeg");
       resolve(imgDataUrl)
