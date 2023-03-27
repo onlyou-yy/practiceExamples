@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button onclick="generatorImg()">genImg</button>
+  <div id="container"></div>
+  <img id="preview" src="" alt="">
+  <script src="./js/composedImg.js"></script>
+  <script>
+    function generatorImg(){
+      genImg({
+        size:430,
+        iconUrl:"http://127.0.0.1:5500/html/test/img/icon1.jpg",
+        bgUrl:"http://127.0.0.1:5500/html/test/img/bg.jpg",
+        name:"test",
+        code:"sss-xx",
+      })
+    }
+  </script>
+</body>
+</html>
