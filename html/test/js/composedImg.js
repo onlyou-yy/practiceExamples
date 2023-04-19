@@ -116,7 +116,7 @@ function genVirtualDataUrl(template){
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(template);
 }
 
-function genImgDataUrlByImgUrl(url,width,height){
+function genImgDataUrlByImgUrl(url,width,height,outType = "image/jpeg",dpi = 0.92){
   return new Promise((resolve,reject)=>{
     const canvas = document.createElement('canvas')
     const context = canvas.getContext("2d");
@@ -128,7 +128,7 @@ function genImgDataUrlByImgUrl(url,width,height){
       context.fillStyle = '#fff'
       context.fillRect(0, 0, 10000, 10000)
       context.drawImage(img, 0, 0)
-      const imgDataUrl = canvas.toDataURL("image/jpeg");
+      const imgDataUrl = canvas.toDataURL(outType,dpi);
       resolve(imgDataUrl)
     }
     img.onerror = (e)=>{
@@ -163,7 +163,6 @@ async function genImg(options = {
   })
   const template = await createTemplate(config);
   const virtualDataUrl = genVirtualDataUrl(template);
-  const imgDataUrl = await genImgDataUrlByImgUrl(virtualDataUrl,width,height);
-  document.querySelector("#preview").src = imgDataUrl;
-  downloadImg(imgDataUrl,"jack");
+  const imgDataUrl = await genImgDataUrlByImgUrl(virtualDataUrl,width,height,config.outType,config.dpi);
+  return imgDataUrl;
 }

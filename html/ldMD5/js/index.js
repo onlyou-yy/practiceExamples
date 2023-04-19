@@ -28,7 +28,8 @@ function genUrl() {
   console.log("postParams", postParams)
 
   let urlObj = new URLSearchParams({
-    type: 'authorization',
+    // type: 'authorization',
+    type: 'ld',
     time: param.time,
     userid: param.userid,
     username: document.querySelector("#username").value || '金阳',

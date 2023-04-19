@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    *{
+      box-sizing: border-box;
+    }
+
+    #progressBox{
+      width: 200px;
+      height: 10px;
+      border-radius: 5px;
+      border: 1px solid black;
+    }
+    #progressBar{
+      width: 100%;
+      height: 100%;
+      background-color: blueviolet;
+    }
+  </style>
+</head>
+<body>
+
+  <button onclick="loadZip()">loadZip</button>
+  <input type="file" id="zipFile">
+  <div id="progressBox">
+    <div id="progressBar"></div>
+  </div>
+  <div id="progressText"></div>
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="./js/composedImg.js"></script>
+  <script>
+    const SIZE = 430 * 3;
+    let progressBarEl = document.querySelector("#progressBar");
+    let progressTextEl = document.querySelector("#progressText");
+
+    let totalCount = 0;
+    let curCount = 0;
+    function progressAdd(){
+      curCount++;
+      let persen = Math.min(1,(curCount / totalCount))  * 100;
+      let wid =`${persen}%`;
+      progressTextEl.innerText = wid;
+      progressBarEl.style.width = wid;
+    }
+    function initProgress(total){
+      totalCount = total;
+      curCount = 0;
+      progressAdd();
+    }
+  </script>
+  <script>
+    let zipFileEl = document.querySelector("#zipFile");
+    let zip = new JSZip();
+
+    function loadZip(){
+      console.time("genZip");
+      let startTime = Date.now();
+      let zips = zipFileEl.files[0];
+      zip.loadAsync(zips)
+        .then(function({files}) {
+          let promiseArr = [];
+          for(let path in files){
+            if(files[path].dir) continue;
+            let fileInfo = path.split(".");
+            let [fileName = "",eqName = ""] = fileInfo[0].split("_");
+            promiseArr.push(zip.file(path).async("base64").then(res=>{
+              return Promise.resolve({
+                originName:path,
+                fileName,
+                eqName,
+                filetype:fileInfo[1],
+                source:"data:image/png;base64," + res,
+              })
+            }));
+          }
+          initProgress(promiseArr.length);
+          Promise.all(promiseArr).then(async allFiles =>{
+            let genZip = new JSZip();
+            let handleArr = [];
+            for(let fileObj of allFiles){
+              handleArr.push(new Promise(async (resolve,reject)=>{
+                let {fileName,eqName,originName,source} = fileObj 
+                let dataURl = await genImg({
+                  size:SIZE,
+                  iconUrl:"./img/icon13.jpg",
+                  bgUrl:source,
+                  name:fileName,
+                  code:eqName,
+                  outType:"image/jpeg",
+                  dpi:0.60,
+                });
+                let base64Data = dataURl.split(",")[1];
+                genZip.file(originName,base64Data,{base64:true});
+                progressAdd()
+                resolve()
+              }))
+            }
+            Promise.all(handleArr).then(_=>{
+              genZip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "example.zip");
+                progressTextEl.innerText = `耗时：${Date.now() - startTime}ms`;
+                console.timeEnd("genZip");
+              });
+            })
+          })
+        });
+    }
+  </script>
+  
+</body>
+</html>

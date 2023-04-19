@@ -16,8 +16,9 @@
       font-size: 16px;
     }
     .qrcode{
+      position:absolute;
       height: 530px;
-      left: 0;
+      left: -200vw;
     }
     .img-bg{
       width: 100%;
@@ -74,6 +75,18 @@
       height: 100px;
       margin-right: 10px;
     }
+
+    #progressBox{
+      width: 200px;
+      height: 10px;
+      border-radius: 5px;
+      border: 1px solid black;
+    }
+    #progressBar{
+      width: 100%;
+      height: 100%;
+      background-color: blueviolet;
+    }
   </style>
 </head>
 <body>
@@ -90,7 +103,12 @@
 
   <button onclick="loadZip()">loadZip</button>
   <input type="file" id="zipFile">
-  <script src="https://cdn.bootcdn.net/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+  <div id="progressBox">
+    <div id="progressBar"></div>
+  </div>
+  <div id="progressText"></div>
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
   <script src="http://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script>
@@ -101,6 +119,9 @@
     let nameEl = document.querySelector(".qrcode-name");
     let desEl = document.querySelector(".qrcode-des");
     let bgEl = document.querySelector(".img-bg");
+    let progressBarEl = document.querySelector("#progressBar");
+    let progressTextEl = document.querySelector("#progressText");
+    
 
     qrcodeEl.style.width = `${SIZE}px`;
     qrcodeEl.style.height = `${~~(SIZE * 1.233)}px`;
@@ -114,13 +135,30 @@
   <script>
     let zipFileEl = document.querySelector("#zipFile");
     let zip = new JSZip();
+
+    let totalCount = 0;
+    let curCount = 0;
+    function progressAdd(){
+      curCount++;
+      let persen = Math.min(1,(curCount / totalCount))  * 100;
+      let wid =`${persen}%`;
+      progressTextEl.innerText = wid;
+      progressBarEl.style.width = wid;
+    }
+    function initProgress(total){
+      totalCount = total;
+      curCount = 0;
+      progressAdd();
+    }
     function loadZip(){
       console.time("genZip");
+      let startTime = Date.now();
       let zips = zipFileEl.files[0];
       zip.loadAsync(zips)
         .then(function({files}) {
           let promiseArr = [];
           for(let path in files){
+            if(files[path].dir) continue;
             let fileInfo = path.split(".");
             let [fileName = "",eqName = ""] = fileInfo[0].split("_");
             promiseArr.push(zip.file(path).async("base64").then(res=>{
@@ -133,22 +171,30 @@
               })
             }));
           }
+          initProgress(promiseArr.length);
           Promise.all(promiseArr).then(async allFiles =>{
             console.log(allFiles);
             let genZip = new JSZip();
+            let handleArr = [];
             for(let fileObj of allFiles){
-              let {fileName,eqName,originName,source} = fileObj 
-              setInfo(fileName,eqName);
-              await loadBg(source);
-              let dataURl = await genImg();
-              let base64Data = dataURl.split(",")[1];
-              genZip.file(originName,base64Data,{base64:true});
+              handleArr.push(new Promise(async (resolve,reject)=>{
+                let {fileName,eqName,originName,source} = fileObj 
+                setInfo(fileName,eqName);
+                await loadBg(source);
+                let dataURl = await genImg();
+                let base64Data = dataURl.split(",")[1];
+                genZip.file(originName,base64Data,{base64:true});
+                progressAdd()
+                resolve()
+              }))
             }
-            console.log(genZip);
-            genZip.generateAsync({type:"blob"}).then(function(content) {
-              saveAs(content, "example.zip");
-              console.timeEnd("genZip");
-            });
+            Promise.all(handleArr).then(_=>{
+              genZip.generateAsync({type:"blob"}).then(function(content) {
+                saveAs(content, "example.zip");
+                progressTextEl.innerText = `耗时：${Date.now() - startTime}ms`;
+                console.timeEnd("genZip");
+              });
+            })
           })
         });
     }
@@ -163,10 +209,10 @@
     }
     function genImg(){
       return new Promise((resolve,reject)=>{
-        html2canvas(qrcodeEl,opts = {
+        html2canvas(qrcodeEl,{
           dpi: window.devicePixelRatio * 4,
         }).then(canvas => {
-          let url = canvas.toDataURL("image/png")
+          let url = canvas.toDataURL("image/jpeg")
           resolve(url);
         });
       })
