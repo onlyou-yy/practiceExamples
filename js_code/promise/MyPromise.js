@@ -59,7 +59,7 @@ export class MyPromise {
             reject(err);
             throw new Error(err)
           }
-        }, 0);
+        });
       }
 
       if (this.promiseStatus === "fulfilled") {

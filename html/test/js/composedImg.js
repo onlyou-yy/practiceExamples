@@ -151,6 +151,8 @@ async function genImg(options = {
   bgUrl:"",
   name:"",
   code:"",
+  outType:"image/jpeg",
+  dpi:0.92,
 }){
   const {size} = options;
   const width = size;
