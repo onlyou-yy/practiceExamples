@@ -1,4 +1,4 @@
-export class MyPromise {
+class MyPromise {
   constructor(exector) {
     this.initValue();
     this.initBind();
@@ -76,6 +76,25 @@ export class MyPromise {
     return thenPromise;
   }
   static resolve(value) {
+    if (typeof value === 'object' || typeof value === 'function') {
+      try {
+        var then = value.then;
+        if (typeof then === 'function') {
+          // return new MyPromise(then.bind(value));
+          return new MyPromise((resolve,reject)=>{
+            value.then(res => {
+              resolve(res)  
+            },err=>{
+              reject(err)
+            })
+          })
+        }
+      } catch (ex) {
+        return new MyPromise(function (resolve, reject) {
+          reject(ex);
+        });
+      }
+    }
     return new MyPromise((resolve, reject) => {
       resolve(value)
     })
@@ -227,17 +246,44 @@ function exectorMicrotasks(fn){
 //   console.log(err)
 // })
 
-const p3 = new MyPromise((resolve, reject) => {
-  resolve(1)
-})
-p3.then(res => {
-  console.log(res)
-  return 2;
-}).then(res => {
-  console.log(res)
-  return new MyPromise((res, rej) => {
-    res(3)
-  })
-}, err => { console.log(err) }).then(res => {
-  console.log(res)
-})
+// const p3 = new MyPromise((resolve, reject) => {
+//   resolve(1)
+// })
+// p3.then(res => {
+//   console.log(res)
+//   return 2;
+// }).then(res => {
+//   console.log(res)
+//   return new MyPromise((res, rej) => {
+//     res(3)
+//   })
+// }, err => { console.log(err) }).then(res => {
+//   console.log(res)
+// })
+
+// new MyPromise((resolve, reject) => {
+//   console.log('外部promise');
+//   resolve();
+// })
+//   .then(() => {
+//     console.log('外部第一个then');
+//     new MyPromise((resolve, reject) => {
+//       console.log('内部promise');
+//       resolve();
+//     })
+//       .then(() => {
+//         console.log('内部第一个then');
+//         return MyPromise.resolve();
+//       })
+//       .then(() => {
+//         console.log('内部第二个then');
+//       })
+//   })
+//   .then(() => {
+//     console.log('外部第二个then');
+//   })
+//   .then(() => {
+//     console.log('外部第三个then');
+//   })
+
+MyPromise.resolve(MyPromise.resolve("s")).then((v)=>console.log(v));
