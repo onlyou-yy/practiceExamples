@@ -7,7 +7,17 @@
  */
 const tokenizer = require("./tokenizer");
 const parser = require("./parser");
+const transformer = require("./traverser");
 
 const input = `(add 2 (subtract 4 2))`;
-console.log(tokenizer(input));
-console.log(JSON.stringify(parser(tokenizer(input)), null, 2));
+// 期待输出 add(2,subtract(4,2))
+
+const tokens = tokenizer(input);
+console.log(`${"-".repeat(20)} tokens ${"-".repeat(20)}`);
+console.log(tokens);
+const ast = parser(tokenizer(input));
+console.log(`${"-".repeat(20)} ast ${"-".repeat(20)}`);
+console.log(JSON.stringify(ast, null, 2));
+const newAst = transformer(ast);
+console.log(`${"-".repeat(20)} newAst ${"-".repeat(20)}`);
+console.log(JSON.stringify(newAst, null, 2));
