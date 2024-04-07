@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <canvas id="viewer"></canvas>
+    <audio
+      crossorigin="anonymous"
+      controls
+      id="audioEl"
+      src="http://172.16.16.42:8088/single.mp3"></audio>
+    <script>
+      const canvas = document.querySelector("#viewer");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth * devicePixelRatio;
+      canvas.height = (window.innerWidth / 2) * devicePixelRatio;
+      const { width, height } = canvas;
+      const audioEl = document.querySelector("#audioEl");
+      let audioCtx, source, analyser, analyserData;
+      audioEl.onplay = function initCtx() {
+        if (audioCtx) return;
+        // 音频上下文，可以创建和获取多个音频处理节点
+        audioCtx = new AudioContext();
+        // 输出源 -> 分析器 -> 设备
+        source = audioCtx.createMediaElementSource(audioEl);
+        analyser = audioCtx.createAnalyser();
+        // 快速傅立叶算法窗口大小，默认为 2048，必须是 2 的 n 次方。值越大，得到的数据越细腻
+        analyser.fftSize = 256;
+        // 得到的数据是一个类型化的数组，每一项为一个字节的值，所以通过 Uint8Array 创建类型化数组，这样没一项就为一个8位（一个字节）的值
+        // 因为通过 快速傅立叶算法 得到的数据是一个镜像的数据，所以实际的数据大小只需要去一半即可 512 / 2
+        analyserData = new Uint8Array(analyser.frequencyBinCount);
+        // 通过connect方法连接各个节点
+        source.connect(analyser);
+        analyser.connect(audioCtx.destination);
+      };
+
+      function draw() {
+        requestAnimationFrame(draw);
+        if (!audioCtx) return;
+        ctx.clearRect(0, 0, width, height);
+        //分析器通过 快速傅立叶算法 将时域数据转换成频率数据
+        analyser.getByteFrequencyData(analyserData);
+        const len = analyserData.length / 2.5;
+        const barWidth = width / len / 2;
+        ctx.fillStyle = "red";
+        for (let i = 0; i < len; i++) {
+          const data = analyserData[i]; // 最大为 2**8 = 256；
+          const barHeight = (data / 255) * height;
+          const x1 = i * barWidth + width / 2;
+          const x2 = width / 2 - (i + 1) * barWidth;
+          const y = height - barHeight;
+          ctx.fillRect(x1, y, barWidth - 2, barHeight);
+          ctx.fillRect(x2, y, barWidth - 2, barHeight);
+        }
+      }
+
+      draw();
+    </script>
+  </body>
+</html>
