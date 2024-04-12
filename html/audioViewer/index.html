@@ -76,18 +76,18 @@
         height: 100%;
       }
       .play-btn {
-        --size: 100px;
+        --size: calc(0.375 * 400px);
+        --side-size: calc(0.25 * 400px);
         position: absolute;
         top: 50%;
         left: calc(50% + var(--size) / 2);
         transform-origin: center;
         transform: translate(-50%, -50%);
         opacity: 1;
-        border-radius: 10px;
         transition: all 0.5s;
-        border-top: var(--size) solid transparent;
-        border-right: var(--size) solid transparent;
-        border-bottom: var(--size) solid transparent;
+        border-top: var(--side-size) solid transparent;
+        border-right: var(--side-size) solid transparent;
+        border-bottom: var(--side-size) solid transparent;
         border-left: var(--size) solid white;
         filter: blur(0px);
       }
