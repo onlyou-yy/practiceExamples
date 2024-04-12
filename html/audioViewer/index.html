@@ -10,50 +10,117 @@
         align-items: center;
         justify-content: center;
       }
+      .container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+      }
       .wrap {
         position: relative;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-end;
         width: 400px;
-        height: 400px;
-        background-color: azure;
-        border-radius: 20px;
+        height: 200px;
+        background-color: #2a272a;
+        border-radius: 20px 20px 0px 0px;
         -webkit-box-reflect: below;
       }
-      #viewer {
+      .viewer-wrap {
+        position: relative;
         width: 90%;
         height: 90%;
-        border: 4px solid black;
-        border-radius: 50%;
+        border: 6px solid white;
+        border-bottom: none;
+        border-radius: 1000px 1000px 0px 0px;
+        background-image: url(https://pic2.zhimg.com/fd1f356eba0276829812c23418681d84_r.jpg?source=1940ef5c);
+        background-size: cover;
+        background-repeat: no-repeat;
+        box-shadow: inset 0px 5px 0px white;
+        transition: all 1s;
       }
-      .play-btn {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 30%;
-        height: 30%;
-        background-color: red;
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0;
-      }
-      .play-btn::before {
+      .viewer-wrap::before {
+        --gradient-start-percent: 0%;
+        --gradient-end-percent: 0%;
         content: "";
+        position: absolute;
+        left: 0px;
+        bottom: 0px;
         width: 100%;
         height: 4px;
-        border-radius: 50%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.01) var(--gradient-start-percent),
+          white,
+          rgba(255, 255, 255, 0.01) var(--gradient-end-percent),
+          transparent
+        );
+        filter: blur(2px);
+        transition: all 1s;
+      }
+      .viewer-wrap::after {
+        content: "";
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        border-radius: 1000px 1000px 0px 0px;
+        background-color: #303030;
+        transition: all 1s;
+        opacity: 1;
+      }
+      #viewer {
+        width: 100%;
+        height: 100%;
+      }
+      .play-btn {
+        --size: 100px;
+        position: absolute;
+        top: 50%;
+        left: calc(50% + var(--size) / 2);
+        transform-origin: center;
+        transform: translate(-50%, -50%);
+        opacity: 1;
+        border-radius: 10px;
+        transition: all 0.5s;
+        border-top: var(--size) solid transparent;
+        border-right: var(--size) solid transparent;
+        border-bottom: var(--size) solid transparent;
+        border-left: var(--size) solid white;
+        filter: blur(0px);
       }
       #audioEl {
         width: 100%;
         height: 100%;
         display: none;
       }
+
+      .playing .play-btn {
+        filter: blur(100px);
+      }
+      .playing .viewer-wrap::after {
+        opacity: 0;
+      }
+      .playing .viewer-wrap::before {
+        --gradient-start-percent: 10%;
+        --gradient-end-percent: 90%;
+      }
+      .playing .viewer-wrap {
+        border: 6px solid #bffcf9;
+        border-bottom: none;
+        box-shadow: inset 0px 5px 15px white;
+      }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <canvas id="viewer"></canvas>
+    <div class="container">
+      <div class="wrap">
+        <div class="viewer-wrap">
+          <canvas id="viewer"></canvas>
+        </div>
+      </div>
       <div class="play-btn" onclick="playAudio()">
         <audio
           crossorigin="anonymous"
@@ -64,6 +131,7 @@
     </div>
 
     <script>
+      const containerEl = document.querySelector(".container");
       const canvas = document.querySelector("#viewer");
       const ctx = canvas.getContext("2d");
       const { offsetWidth, offsetHeight } = canvas;
@@ -77,9 +145,14 @@
           audioEl.play();
         } else {
           audioEl.pause();
+          containerEl.classList.remove("playing");
         }
       }
+      audioEl.onended = function () {
+        containerEl.classList.remove("playing");
+      };
       audioEl.onplay = function initCtx() {
+        containerEl.classList.add("playing");
         if (audioCtx) return;
         // 音频上下文，可以创建和获取多个音频处理节点
         audioCtx = new AudioContext();
@@ -104,28 +177,18 @@
         analyser.getByteFrequencyData(analyserData);
         const len = analyserData.length / 2;
         const barWidth = width / len / 2;
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "white";
         for (let i = 0; i < len; i++) {
           const data =
             (analyserData[2 * i] + (analyserData[2 * i + 1] || 0)) / 2; // 最大为 2**8 = 256；
           const barHeight = (data / 255) * height;
           const x1 = i * barWidth + width / 2 - 0; //2 * barWidth
           const x2 = width / 2 - (i + 1) * barWidth + 0;
-          const y = (height - barHeight) / 2;
+          // const y = (height - barHeight) / 2;
+          const y = height - barHeight;
           ctx.fillRect(x1, y, barWidth - 2, barHeight);
           ctx.fillRect(x2, y, barWidth - 2, barHeight);
         }
-
-        // const len = analyserData.length;
-        // const barWidth = width / len;
-        // ctx.fillStyle = "red";
-        // for (let i = 0; i < len; i++) {
-        //   const data = analyserData[i]; // 最大为 2**8 = 256；
-        //   const barHeight = (data / 255) * height;
-        //   const x1 = i * barWidth;
-        //   const y = height - barHeight;
-        //   ctx.fillRect(x1, y, barWidth - 2, barHeight);
-        // }
       }
 
       draw();
